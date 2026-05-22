@@ -85,7 +85,7 @@ export default function Navbar() {
                 href={l.href}
                 className={`text-[15px] font-medium transition-colors duration-150 ${
                   isActive(l.href)
-                    ? "text-[#1a1a1a] dark:text-white font-semibold"
+                    ? "text-primary dark:text-primary font-semibold"
                     : "text-[#4b5563] dark:text-[#a3a3a3] hover:text-[#1a1a1a] dark:hover:text-white"
                 }`}
               >
