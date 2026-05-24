@@ -13,6 +13,7 @@ import {
   Terminal,
 } from "lucide-react";
 import Link from "next/link";
+import Editor from "@monaco-editor/react";
 
 const SAMPLES = {
   JavaScript: `const numbers = [5, 2, 8, 1];
@@ -344,6 +345,30 @@ export default function DryRunClient() {
   const [step, setStep] = useState(0);
   const [playing, setPlaying] = useState(false);
   const [speed, setSpeed] = useState(900);
+  const [isDarkMode, setIsDarkMode] = useState(false);
+
+  // Sync Monaco Editor theme with standard body/html classes
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setIsDarkMode(document.documentElement.classList.contains("dark"));
+    }
+
+    const observer = new MutationObserver(() => {
+      setIsDarkMode(document.documentElement.classList.contains("dark"));
+    });
+
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+
+    return () => observer.disconnect();
+  }, []);
+
+  const monacoLanguage = useMemo(() => {
+    if (language === "C++") return "cpp";
+    return language.toLowerCase();
+  }, [language]);
 
   const trace = useMemo(() => buildTrace(source), [source]);
   const current = trace[Math.min(step, trace.length - 1)];
@@ -435,13 +460,31 @@ export default function DryRunClient() {
               Reset sample
             </button>
           </div>
-          <textarea
-            value={source}
-            onChange={(event) => setSource(event.target.value)}
-            spellCheck={false}
-            className="min-h-[420px] w-full resize-y bg-slate-950 p-4 font-mono text-sm leading-6 text-slate-100 outline-none"
-            aria-label="Code input for dry run visualizer"
-          />
+          <div className="overflow-hidden rounded-b-xl">
+            <Editor
+              height="420px"
+              language={monacoLanguage}
+              theme={isDarkMode ? "vs-dark" : "light"}
+              value={source}
+              onChange={(value) => setSource(value || "")}
+              loading={
+                <div className="flex h-[420px] items-center justify-center bg-slate-950 font-mono text-sm text-slate-400">
+                  Loading Editor...
+                </div>
+              }
+              options={{
+                minimap: { enabled: false },
+                fontSize: 14,
+                fontFamily: "'Fira Code', 'Courier New', Courier, monospace",
+                lineHeight: 22,
+                padding: { top: 16, bottom: 16 },
+                scrollBeyondLastLine: false,
+                automaticLayout: true,
+                cursorBlinking: "smooth",
+                renderLineHighlight: "all",
+              }}
+            />
+          </div>
         </section>
 
         <section className="space-y-4">
