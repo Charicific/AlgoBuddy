@@ -47,7 +47,6 @@ const BinarySearch = () => {
     togglePlayPause,
     increaseSpeed,
     decreaseSpeed,
-    checkPause,
   } = usePlayback(() => loadFromStorage("binary-speed", 1));
 
   const animationRef = useRef(null);
@@ -95,7 +94,6 @@ const BinarySearch = () => {
     setStepExplanation("");
     setStepCount(0);
     setIsAnimating(false);
-    setIsPaused(false);
     setPendingStart(false);
     isPausedRef.current = false;
 
@@ -132,7 +130,7 @@ const BinarySearch = () => {
   };
 
   // FIX: animateBinarySearch is now a stable useCallback so it can be
-  // safely referenced in effects and togglePlayPause without stale closures.
+  // safely referenced in effects without stale closures.
   const animateBinarySearch = useCallback(() => {
     const { l, h, arr, targetValue } = searchStateRef.current;
     // FIX: delay is read from speedRef on EVERY call, so mid-animation
@@ -164,23 +162,11 @@ const BinarySearch = () => {
     elementRefs.current.forEach((ref, index) => {
       if (!ref) return;
       if (index === m) {
-        gsap.to(ref, {
-          backgroundColor: "#EAB308",
-          borderColor: "#A16207",
-          duration: 0.3,
-        });
+        gsap.to(ref, { backgroundColor: "#EAB308", borderColor: "#A16207", duration: 0.3 });
       } else if (index >= l && index <= h) {
-        gsap.to(ref, {
-          backgroundColor: "#93C5FD",
-          borderColor: "#3B82F6",
-          duration: 0.3,
-        });
+        gsap.to(ref, { backgroundColor: "#93C5FD", borderColor: "#3B82F6", duration: 0.3 });
       } else {
-        gsap.to(ref, {
-          backgroundColor: "#E5E7EB",
-          borderColor: "#D1D5DB",
-          duration: 0.3,
-        });
+        gsap.to(ref, { backgroundColor: "#E5E7EB", borderColor: "#D1D5DB", duration: 0.3 });
       }
     });
 
@@ -193,7 +179,6 @@ const BinarySearch = () => {
           `✓ arr[${m}] = ${arr[m]} equals target ${targetValue}. Found at index ${m} after ${currentStep} step${currentStep > 1 ? "s" : ""}!`
         );
         setIsAnimating(false);
-
         gsap.to(elementRefs.current[m], {
           backgroundColor: "#22C55E",
           borderColor: "#15803D",
@@ -204,22 +189,16 @@ const BinarySearch = () => {
           `arr[${m}] = ${arr[m]} < target ${targetValue} → target is in the RIGHT half. Discard left side. New low = ${m + 1}.`
         );
         searchStateRef.current.l = m + 1;
-
         animationRef.current = setTimeout(() => {
-          if (!isPausedRef.current) {
-            animateBinarySearch();
-          }
+          if (!isPausedRef.current) animateBinarySearch();
         }, delay * 0.6);
       } else {
         setStepExplanation(
           `arr[${m}] = ${arr[m]} > target ${targetValue} → target is in the LEFT half. Discard right side. New high = ${m - 1}.`
         );
         searchStateRef.current.h = m - 1;
-
         animationRef.current = setTimeout(() => {
-          if (!isPausedRef.current) {
-            animateBinarySearch();
-          }
+          if (!isPausedRef.current) animateBinarySearch();
         }, delay * 0.6);
       }
     }, delay);
@@ -227,7 +206,6 @@ const BinarySearch = () => {
 
   const handleGo = (e) => {
     e.preventDefault();
-
     clearTimeout(animationRef.current);
 
     setArray([]);
@@ -249,13 +227,10 @@ const BinarySearch = () => {
     }
 
     const rawElements = arrayElements.split(",").map((el) => el.trim());
-
     const hasDecimals = rawElements.some((el) => el.includes("."));
 
     if (hasDecimals) {
-      setMessage(
-        "Only integers are supported. Please remove decimal values."
-      );
+      setMessage("Only integers are supported. Please remove decimal values.");
       setMessageType("warning");
       return;
     }
@@ -295,7 +270,6 @@ const BinarySearch = () => {
     setMessage("");
     setMessageType("");
     setIsAnimating(true);
-    isSearchingRef.current = true;
 
     // FIX: signal the effect to start animation after the array renders
     setPendingStart(true);
@@ -309,24 +283,20 @@ const BinarySearch = () => {
     }
   }, [pendingStart, array, animateBinarySearch]);
 
-  const togglePlayPause = useCallback(() => {
-    setIsPaused((prev) => {
-      const newPaused = !prev;
-      isPausedRef.current = newPaused;
-      if (!newPaused) {
-        // FIX: clear any pending timeout before resuming to prevent
-        // multiple concurrent animation chains on rapid toggle
-        clearTimeout(animationRef.current);
-        animateBinarySearch();
-      }
-      return newPaused;
-    });
-  }, [animateBinarySearch]);
-
-  const togglePlayPauseRef = useRef(togglePlayPause);
+  // Sync isPausedRef with isPaused from usePlayback
   useEffect(() => {
-    togglePlayPauseRef.current = togglePlayPause;
-  }, [togglePlayPause]);
+    isPausedRef.current = isPaused;
+    if (!isPaused && isAnimating) {
+      clearTimeout(animationRef.current);
+      animateBinarySearch();
+    }
+  }, [isPaused, isAnimating, animateBinarySearch]);
+
+  useVisualizerKeyboard({ isAnimating, togglePlayPause });
+
+  useEffect(() => {
+    return () => clearTimeout(animationRef.current);
+  }, []);
 
   const messageClass =
     messageType === "success"
@@ -338,8 +308,7 @@ const BinarySearch = () => {
   return (
     <main className="container mx-auto">
       <p className="text-lg text-center text-gray-600 dark:text-gray-400 mb-8">
-        Visualize how Binary Search efficiently finds an element in a sorted
-        array.
+        Visualize how Binary Search efficiently finds an element in a sorted array.
       </p>
 
       <form
@@ -348,13 +317,9 @@ const BinarySearch = () => {
         className="max-w-4xl mx-auto bg-white dark:bg-neutral-950 p-6 rounded-xl border border-gray-200 dark:border-gray-700 mb-8"
       >
         <div className="mb-4">
-          <label
-            className="block text-gray-700 dark:text-gray-300 mb-2"
-            htmlFor="arrayElements"
-          >
+          <label className="block text-gray-700 dark:text-gray-300 mb-2" htmlFor="arrayElements">
             Sorted Array Elements (comma-separated)
           </label>
-
           <div className="flex gap-2">
             <input
               type="text"
@@ -365,7 +330,6 @@ const BinarySearch = () => {
               placeholder="e.g., 1, 3, 4, 6, 8"
               disabled={isAnimating}
             />
-
             <button
               type="button"
               onClick={generateRandomArray}
@@ -378,13 +342,9 @@ const BinarySearch = () => {
         </div>
 
         <div className="mb-4">
-          <label
-            className="block text-gray-700 dark:text-gray-300 mb-2"
-            htmlFor="target"
-          >
+          <label className="block text-gray-700 dark:text-gray-300 mb-2" htmlFor="target">
             Target Element
           </label>
-
           <div className="flex flex-col sm:flex-row sm:items-end gap-4">
             <input
               type="number"
@@ -395,13 +355,8 @@ const BinarySearch = () => {
               placeholder="eg. 4"
               disabled={isAnimating}
             />
-
             <div className="flex gap-2 w-full">
-              <GoButton
-                onClick={handleGo}
-                isAnimating={isAnimating}
-                disabled={isAnimating}
-              />
+              <GoButton onClick={handleGo} isAnimating={isAnimating} disabled={isAnimating} />
               <ResetButton onReset={handleReset} isAnimating={isAnimating} />
             </div>
           </div>
@@ -427,8 +382,6 @@ const BinarySearch = () => {
 
       {array.length > 0 && (
         <div className="max-w-4xl mx-auto space-y-6">
-
-          {/* Step Explanation Panel */}
           {stepExplanation && (
             <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
               <div className="flex items-center gap-2 bg-[#a435f0]/10 dark:bg-[#a435f0]/20 px-4 py-2 border-b border-[#a435f0]/20">
@@ -447,38 +400,25 @@ const BinarySearch = () => {
                   {stepExplanation}
                 </p>
               </div>
-
-              {/* Legend */}
               <div className="px-4 py-2 bg-gray-50 dark:bg-gray-900/50 border-t border-gray-100 dark:border-gray-700 flex flex-wrap gap-4 text-xs text-gray-500 dark:text-gray-400">
-                <span>
-                  <span className="font-semibold text-yellow-600 dark:text-yellow-400">■ Yellow</span> = mid index
-                </span>
-                <span>
-                  <span className="font-semibold text-blue-500 dark:text-blue-400">■ Blue</span> = active search range
-                </span>
-                <span>
-                  <span className="font-semibold text-gray-400">■ Gray</span> = eliminated
-                </span>
-                <span>
-                  <span className="font-semibold text-green-500">■ Green</span> = found
-                </span>
+                <span><span className="font-semibold text-yellow-600 dark:text-yellow-400">■ Yellow</span> = mid index</span>
+                <span><span className="font-semibold text-blue-500 dark:text-blue-400">■ Blue</span> = active search range</span>
+                <span><span className="font-semibold text-gray-400">■ Gray</span> = eliminated</span>
+                <span><span className="font-semibold text-green-500">■ Green</span> = found</span>
               </div>
             </div>
           )}
 
-          {/* Array Visualization */}
           <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
             <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-6 text-center">
               Array Visualization
             </h2>
-
             <div className="flex flex-wrap gap-4 justify-center">
               {array.map((element, index) => {
                 const labels = [];
                 if (index === i) labels.push("low");
                 if (index === mid) labels.push("mid");
                 if (index === j) labels.push("high");
-
                 return (
                   <div key={index} className="flex flex-col items-center">
                     <div
@@ -487,7 +427,6 @@ const BinarySearch = () => {
                     >
                       {element}
                     </div>
-
                     <div className="mt-1 text-xs text-gray-600 dark:text-gray-400 text-center font-mono">
                       {labels.map((label, idx) => (
                         <div
@@ -503,9 +442,7 @@ const BinarySearch = () => {
                           {label}
                         </div>
                       ))}
-                      <div className="text-gray-400 dark:text-gray-600 text-[10px]">
-                        [{index}]
-                      </div>
+                      <div className="text-gray-400 dark:text-gray-600 text-[10px]">[{index}]</div>
                     </div>
                   </div>
                 );
