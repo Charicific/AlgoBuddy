@@ -179,10 +179,63 @@ test("joinCollaborationSession resolves random join codes without anonymous list
     visibility: "unlisted",
   });
 
-  const joined = await joinCollaborationSession(session.joinCode);
+  const joined = await joinCollaborationSession(session.joinCode, { userId: "user_join_by_code" });
   assert.ok(!joined.error, "valid join code must allow joining");
   assert.equal(joined.session.id, session.id, "join code must resolve to the session ID server-side");
   assert.equal(joined.session.joinCode, session.joinCode, "join response may return the code to the joining user");
+  assert.ok(joined.subscriptionToken, "join must return a realtime subscription token");
+  assert.equal(joined.sessionSecret, undefined, "join must not return the long-lived session secret");
+});
+
+test("joinCollaborationSession requires an authenticated participant user id", async () => {
+  const {
+    createCollaborationSession,
+    joinCollaborationSession,
+  } = await loadStore();
+
+  const { session } = await createCollaborationSession({
+    title: "Join auth required",
+    visibility: "public",
+  });
+
+  const result = await joinCollaborationSession(session.id);
+  assert.equal(result.status, 401, "joining without a user id must be rejected");
+  assert.equal(result.error, "Authentication required");
+});
+
+test("exchangeRealtimeSubscriptionToken is user-bound and single-use", async () => {
+  const {
+    createCollaborationSession,
+    joinCollaborationSession,
+    exchangeRealtimeSubscriptionToken,
+  } = await loadStore();
+
+  const { session } = await createCollaborationSession({
+    title: "Realtime token exchange",
+    visibility: "public",
+  });
+
+  const joined = await joinCollaborationSession(session.id, { userId: "token_user_1" });
+  assert.ok(joined.subscriptionToken, "join must return a token for exchange");
+
+  const denied = await exchangeRealtimeSubscriptionToken(session.id, {
+    subscriptionToken: joined.subscriptionToken,
+    userId: "token_user_2",
+  });
+  assert.equal(denied.status, 403, "different participant user id must be rejected");
+
+  const granted = await exchangeRealtimeSubscriptionToken(session.id, {
+    subscriptionToken: joined.subscriptionToken,
+    userId: "token_user_1",
+  });
+  assert.ok(granted.realtimeChannel, "valid token exchange must return realtime channel credential");
+  assert.match(granted.realtimeChannel, /^collab:session_[a-f0-9]+:[A-Za-z0-9_-]+$/);
+
+  const replay = await exchangeRealtimeSubscriptionToken(session.id, {
+    subscriptionToken: joined.subscriptionToken,
+    userId: "token_user_1",
+  });
+  assert.equal(replay.status, 403, "subscription token must be single-use");
 });
 
 test("getCollaborationSession (internal) retains all fields including sessionSecret", async () => {
@@ -237,13 +290,20 @@ test("joinCollaborationSession for private session requires correct password", a
     "private session passwords must not be stored as unsalted SHA-256",
   );
 
-  const denied = await joinCollaborationSession(session.id, { password: "wrong" });
+  const denied = await joinCollaborationSession(session.id, {
+    password: "wrong",
+    userId: "private_join_user",
+  });
   assert.equal(denied.status, 403, "wrong password must be rejected with 403");
   assert.ok(denied.error, "rejected join must include an error message");
 
-  const granted = await joinCollaborationSession(session.id, { password: "correct-password" });
+  const granted = await joinCollaborationSession(session.id, {
+    password: "correct-password",
+    userId: "private_join_user",
+  });
   assert.ok(!granted.error, "correct password must be accepted");
-  assert.ok(granted.sessionSecret, "granted join must return sessionSecret to the joining user");
+  assert.ok(granted.subscriptionToken, "granted join must return a realtime subscription token");
+  assert.equal(granted.sessionSecret, undefined, "join must never return sessionSecret");
   assert.equal(
     granted.session?.passwordHash,
     undefined,
@@ -267,11 +327,18 @@ test("joinCollaborationSession migrates legacy SHA-256 password hashes after suc
   const internal = await getCollaborationSession(session.id);
   internal.passwordHash = legacySha256("legacy-password");
 
-  const denied = await joinCollaborationSession(session.id, { password: "wrong-password" });
+  const denied = await joinCollaborationSession(session.id, {
+    password: "wrong-password",
+    userId: "legacy_migration_user",
+  });
   assert.equal(denied.status, 403, "wrong legacy password must still be rejected");
 
-  const granted = await joinCollaborationSession(session.id, { password: "legacy-password" });
+  const granted = await joinCollaborationSession(session.id, {
+    password: "legacy-password",
+    userId: "legacy_migration_user",
+  });
   assert.ok(!granted.error, "correct legacy password must be accepted during migration");
+  assert.ok(granted.subscriptionToken, "successful join must return a subscription token");
 
   const migrated = await getCollaborationSession(session.id);
   assert.equal(
