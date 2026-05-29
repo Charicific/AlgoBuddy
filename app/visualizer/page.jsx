@@ -146,6 +146,7 @@ const sections = [
           { name: "Insertion Sort", path: "/visualizer/sorting/insertionsort" },
           { name: "Merge Sort", path: "/visualizer/sorting/mergesort" },
           { name: "Quick Sort", path: "/visualizer/sorting/quicksort" },
+          { name: "Heap Sort", path: "/visualizer/sorting/heapsort" },
           { name: "Comparison Mode", path: "/visualizer/sorting/comparison" },
           { name: "Counting Sort", path: "/visualizer/sorting/countingsort" },
         ],
@@ -647,7 +648,10 @@ const Visualizer = () => {
   /* Strip non-serialisable `info` (contains JSX modals) before
      passing to the client component. Icons are fine — they're
      plain <svg> elements. */
-  const clientSections = sections.map(({ info, ...rest }) => rest);
+  const clientSections = sections.map(({ info, ...rest }) => ({
+    ...rest,
+    slug: rest.title.toLowerCase().replace(/\s+/g, "-")
+  }));
 
   return (
     <div

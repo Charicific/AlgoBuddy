@@ -8,6 +8,7 @@ import {
   insertionSortGen,
   mergeSortGen,
   quickSortGen,
+  heapSortGen,
 } from "@/utils/sortingGenerators";
 
 const ALGORITHMS = {
@@ -16,6 +17,7 @@ const ALGORITHMS = {
   insertion: { name: "Insertion Sort", gen: insertionSortGen, complexity: "O(N²)" },
   merge: { name: "Merge Sort", gen: mergeSortGen, complexity: "O(N log N)" },
   quick: { name: "Quick Sort", gen: quickSortGen, complexity: "O(N log N)" },
+  heap: { name: "Heap Sort", gen: heapSortGen, complexity: "O(N log N)" },
 };
 
 const getFontSize = (value) => {
@@ -99,6 +101,19 @@ const getBarStyles = (index, value, algoKey, currentIndices, isCompleted, maxVal
         bgClass = "bg-rose-100 dark:bg-rose-950 text-rose-700 dark:text-rose-300 border-rose-400 dark:border-rose-700";
       } else if (index === boundary) {
         bgClass = "bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300 border-purple-400 dark:border-purple-700";
+      }
+      break;
+    case "heap":
+      if (swapping.includes(index)) {
+        bgClass = "bg-rose-100 dark:bg-rose-950 text-rose-700 dark:text-rose-300 border-rose-400 dark:border-rose-700";
+      } else if (comparing.includes(index)) {
+        bgClass = "bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300 border-amber-400 dark:border-amber-700";
+      } else if (index === active) {
+        bgClass = "bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300 border-purple-400 dark:border-purple-700";
+      } else if (currentIndices.sortedStart !== undefined && index >= currentIndices.sortedStart) {
+        bgClass = "bg-emerald-50 dark:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-900";
+      } else if (currentIndices.heapSize !== undefined && index >= currentIndices.heapSize) {
+        bgClass = "bg-slate-100 dark:bg-slate-900 text-slate-500 dark:text-slate-400 border-slate-300 dark:border-slate-700";
       }
       break;
     default:
@@ -351,7 +366,7 @@ export default function ComparisonClient() {
                   value={algoKeyA}
                   onChange={(e) => setAlgoKeyA(e.target.value)}
                   disabled={isSorting}
-                  className="w-full h-11 px-3 border rounded-xl bg-neutral-50 dark:bg-neutral-850 dark:border-neutral-700 text-[#1a1a1a] dark:text-white text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-[#a435f0]/30 transition-all cursor-pointer"
+                  className="w-full h-11 px-3 border rounded-xl bg-neutral-50 dark:bg-neutral-800 dark:border-neutral-700 text-[#1a1a1a] dark:text-white text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-[#a435f0]/30 transition-all cursor-pointer"
                 >
                   {Object.entries(ALGORITHMS).map(([key, val]) => (
                     <option key={key} value={key}>{val.name} ({val.complexity})</option>
@@ -365,7 +380,7 @@ export default function ComparisonClient() {
                   value={algoKeyB}
                   onChange={(e) => setAlgoKeyB(e.target.value)}
                   disabled={isSorting}
-                  className="w-full h-11 px-3 border rounded-xl bg-neutral-50 dark:bg-neutral-850 dark:border-neutral-700 text-[#1a1a1a] dark:text-white text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-[#a435f0]/30 transition-all cursor-pointer"
+                  className="w-full h-11 px-3 border rounded-xl bg-neutral-50 dark:bg-neutral-800 dark:border-neutral-700 text-[#1a1a1a] dark:text-white text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-[#a435f0]/30 transition-all cursor-pointer"
                 >
                   {Object.entries(ALGORITHMS).map(([key, val]) => (
                     <option key={key} value={key}>{val.name} ({val.complexity})</option>
@@ -482,7 +497,7 @@ export default function ComparisonClient() {
         
         {/* Left Side: Algorithm A */}
         <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl overflow-hidden shadow-sm flex flex-col">
-          <div className="px-5 py-4 border-b border-neutral-100 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-850 flex justify-between items-center">
+          <div className="px-5 py-4 border-b border-neutral-100 dark:border-neutral-800 bg-neutral-50 dark:bg-gradient-to-b dark:from-neutral-800 dark:to-neutral-950 flex justify-between items-center">
             <div>
               <h2 className="font-extrabold text-neutral-900 dark:text-white text-lg">
                 {ALGORITHMS[algoKeyA].name}
@@ -521,7 +536,7 @@ export default function ComparisonClient() {
           </div>
 
           {/* Viz Box A */}
-          <div className="p-6 h-[260px] sm:h-[300px] flex items-end justify-center gap-1.5 sm:gap-2 bg-neutral-50 dark:bg-neutral-950/20 border-b border-neutral-100 dark:border-neutral-800">
+          <div className="p-6 h-[260px] sm:h-[300px] flex items-end justify-center gap-1.5 sm:gap-2 bg-neutral-50 dark:bg-neutral-900/50 border-b border-neutral-100 dark:border-neutral-800">
             {arrayA.length > 0 ? (
               arrayA.map((val, idx) => {
                 const { bgClass, style } = getBarStyles(idx, val, algoKeyA, currentIndicesA, completedA, maxValue);
@@ -554,7 +569,7 @@ export default function ComparisonClient() {
 
         {/* Right Side: Algorithm B */}
         <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl overflow-hidden shadow-sm flex flex-col">
-          <div className="px-5 py-4 border-b border-neutral-100 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-850 flex justify-between items-center">
+          <div className="px-5 py-4 border-b border-neutral-100 dark:border-neutral-800 bg-neutral-50 dark:bg-gradient-to-b dark:from-neutral-800 dark:to-neutral-950 flex justify-between items-center">
             <div>
               <h2 className="font-extrabold text-neutral-900 dark:text-white text-lg">
                 {ALGORITHMS[algoKeyB].name}
@@ -593,7 +608,7 @@ export default function ComparisonClient() {
           </div>
 
           {/* Viz Box B */}
-          <div className="p-6 h-[260px] sm:h-[300px] flex items-end justify-center gap-1.5 sm:gap-2 bg-neutral-50 dark:bg-neutral-950/20 border-b border-neutral-100 dark:border-neutral-800">
+          <div className="p-6 h-[260px] sm:h-[300px] flex items-end justify-center gap-1.5 sm:gap-2 bg-neutral-50 dark:bg-neutral-900/50 border-b border-neutral-100 dark:border-neutral-800">
             {arrayB.length > 0 ? (
               arrayB.map((val, idx) => {
                 const { bgClass, style } = getBarStyles(idx, val, algoKeyB, currentIndicesB, completedB, maxValue);
@@ -628,7 +643,7 @@ export default function ComparisonClient() {
 
       {/* Winner Summary Panel */}
       {winnerMessage && (
-        <div className="mt-8 bg-gradient-to-r from-violet-50 via-purple-50 to-indigo-50 dark:from-neutral-850 dark:via-neutral-850 dark:to-neutral-850 border border-violet-200 dark:border-neutral-800 p-6 rounded-2xl shadow-sm text-center max-w-2xl mx-auto animate-fade-in">
+        <div className="mt-8 bg-gradient-to-r from-violet-50 via-purple-50 to-indigo-50 dark:from-neutral-900 dark:via-neutral-900 dark:to-neutral-900 border border-violet-200 dark:border-neutral-800 p-6 rounded-2xl shadow-sm text-center max-w-2xl mx-auto animate-fade-in">
           <div className="w-14 h-14 bg-amber-100 dark:bg-amber-900/40 text-amber-500 rounded-full flex items-center justify-center mx-auto mb-4 border border-amber-300 dark:border-amber-800 shadow-sm animate-pulse">
             <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
               <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H7c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.04-.42 1.99-1.07 2.75z" className="hidden" />
