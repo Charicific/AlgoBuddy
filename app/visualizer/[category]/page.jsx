@@ -35,8 +35,7 @@ export default async function CategoryPage({ params }) {
 
   return (
     <div
-      className="min-h-screen bg-white dark:bg-[#1c1d1f] text-gray-800 dark:text-gray-200 flex flex-col"
-      style={{ fontFamily: "'Inter', 'Source Sans 3', sans-serif" }}
+      className="min-h-screen bg-white dark:bg-[#1c1d1f] text-[#1a1a1a] dark:text-[#f5f5f5] flex flex-col"
     >
       <div className="w-full px-6 md:px-12 pt-6">
         <div className="mb-4 mt-2">
