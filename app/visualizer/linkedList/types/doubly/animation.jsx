@@ -1,7 +1,6 @@
 'use client';
 import React, { useState, useRef, useEffect } from 'react';
 import ResetButton from '@/app/components/ui/resetButton';
-import useVisualizerReset from "@/app/hooks/useVisualizerReset";
 import {
   VisualizerCard,
   VisualizerInteractiveLayout,
@@ -13,15 +12,10 @@ const DoublyLinkedListVisualizer = () => {
   const [isAnimating, setIsAnimating] = useState(false);
   const nodeIdCounter = useRef(1);
   const animationRef = useRef(null);
-  useVisualizerReset(() => {
-    setInputValue("");
-    setList([]);
-    setIsAnimating(false);
-  });
 
   const PointerBridge = ({ direction, label, color, reversed = false }) => {
     const laneClass = direction === 'next'
-      ? 'text-primary dark:text-[#c27cf7]'
+      ? 'text-blue-600 dark:text-blue-400'
       : 'text-purple-600 dark:text-purple-400';
 
     const markerId = `${direction}-bridge-arrow`;
@@ -110,7 +104,7 @@ const DoublyLinkedListVisualizer = () => {
       <p className="text-center text-lg text-[#6b7280] dark:text-[#9ca3af]">
         Visualize Doubly Linked List Operations
       </p>
-      
+
       {/* Input Form */}
       <VisualizerCard className="mb-0">
         <div className="mb-3">

@@ -2,7 +2,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { gsap } from 'gsap';
 import ResetButton from '@/app/components/ui/resetButton';
-import useVisualizerReset from "@/app/hooks/useVisualizerReset";
 import {
   VisualizerCard,
   VisualizerInteractiveLayout,
@@ -15,11 +14,6 @@ const CircularLinkedListVisualizer = () => {
   const [diagramSize, setDiagramSize] = useState({ width: 0, height: 0 });
   const nodeIdCounter = useRef(1);
   const stageRef = useRef(null);
-  useVisualizerReset(() => {
-    setInputValue("");
-    setList([]);
-    setIsAnimating(false);
-  });
 
   // Generate random memory addresses
   const generateMemoryAddress = () => {
@@ -119,7 +113,7 @@ const CircularLinkedListVisualizer = () => {
       <p className="text-center text-lg text-[#6b7280] dark:text-[#9ca3af]">
         Visualize Circular Linked List Operations
       </p>
-      
+
       {/* Input Form */}
       <VisualizerCard className="mb-0">
         <div className="mb-4">
@@ -240,12 +234,12 @@ const CircularLinkedListVisualizer = () => {
                         width: '160px',
                       }}
                     >
-                      <div className={`flex flex-col border-2 ${index === 0 ? 'border-green-500' : 'border-primary'} rounded-xl p-4 bg-white dark:bg-gray-700 shadow-md`}>
+                      <div className={`flex flex-col border-2 ${index === 0 ? 'border-green-500' : 'border-blue-500'} rounded-xl p-4 bg-white dark:bg-gray-700 shadow-md`}>
                         <div className="flex justify-between items-center mb-3">
                           <span className="font-mono text-xs text-gray-600 dark:text-gray-300">
                             {node.address}
                           </span>
-                          <span className={`text-xs px-2 py-1 rounded ${index === 0 ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-blue-100 text-primary-dark dark:bg-blue-900 dark:text-blue-200'}`}>
+                          <span className={`text-xs px-2 py-1 rounded ${index === 0 ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'}`}>
                             {index === 0 ? 'HEAD' : `Node ${index}`}
                           </span>
                         </div>
@@ -265,7 +259,6 @@ const CircularLinkedListVisualizer = () => {
                     </div>
                   );
                 })}
-
               </div>
             </div>
           )}
