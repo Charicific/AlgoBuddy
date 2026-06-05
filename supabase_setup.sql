@@ -1,3 +1,6 @@
+-- Add joined_community column to user_profiles for Join Community Button
+ALTER TABLE user_profiles ADD COLUMN IF NOT EXISTS joined_community BOOLEAN DEFAULT false;
+
 -- Create community_contributors table for the Contributors Grid section
 CREATE TABLE IF NOT EXISTS community_contributors (
   id BIGSERIAL PRIMARY KEY,
