@@ -27,11 +27,11 @@ export default function usePlayback(initialSpeed = 1) {
   useEffect(() => {
     const handler = (delta, envelope) => {
       if (envelope?.eventName === "playback:toggle") {
-        internalTogglePlayPause();
+        internalTogglePlayPauseRef.current();
       } else if (envelope?.eventName === "playback:set_pause" && delta?.isPaused !== undefined) {
-        internalSetIsPaused(delta.isPaused);
+        internalSetIsPausedRef.current(delta.isPaused);
       } else if (envelope?.eventName === "playback:speed" && delta?.speed !== undefined) {
-        setSpeed(delta.speed);
+        setSpeedRef.current(delta.speed);
       }
     };
     registerHandler("usePlayback", handler);
@@ -52,9 +52,18 @@ export default function usePlayback(initialSpeed = 1) {
     });
   }, []);
 
+  const internalSetIsPausedRef = useRef(internalSetIsPaused);
+  internalSetIsPausedRef.current = internalSetIsPaused;
+
   const internalTogglePlayPause = useCallback(() => {
     internalSetIsPaused((prev) => !prev);
   }, [internalSetIsPaused]);
+
+  const internalTogglePlayPauseRef = useRef(internalTogglePlayPause);
+  internalTogglePlayPauseRef.current = internalTogglePlayPause;
+
+  const setSpeedRef = useRef(setSpeed);
+  setSpeedRef.current = setSpeed;
 
   const setPausedSync = useCallback((val) => {
     internalSetIsPaused(val);
