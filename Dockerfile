@@ -2,13 +2,13 @@
 FROM eclipse-temurin:21-jdk-alpine AS build
 WORKDIR /app
 
-# Copy maven executable and configuration
-COPY mvnw .
-COPY .mvn .mvn
-COPY pom.xml .
+# Copy maven executable and configuration from the backend folder
+COPY backend/mvnw .
+COPY backend/.mvn .mvn
+COPY backend/pom.xml .
 
-# Copy source code
-COPY src src
+# Copy source code from the backend folder
+COPY backend/src src
 
 # Make mvnw executable and build the application
 RUN chmod +x ./mvnw
