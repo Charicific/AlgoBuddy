@@ -4,7 +4,7 @@ import React, { useEffect, useState, useMemo } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { FiChevronRight, FiSearch, FiBookOpen } from "react-icons/fi";
-import { Award, Zap, BookOpen, Layers } from "lucide-react";
+import { Award, Zap, BookOpen, Layers, X } from "lucide-react";
 import Footer from "@/app/components/footer";
 import BackToTop from "@/app/components/ui/backtotop";
 import { practiceData } from "@/lib/practiceData";
@@ -439,9 +439,10 @@ export default function PracticeHub() {
             {search && (
               <button
                 onClick={() => setSearch("")}
+                aria-label="Clear search"
                 className="absolute right-4 top-1/2 -translate-y-1/2 text-surface-400 hover:text-surface-900 dark:hover:text-white transition-colors"
               >
-                x
+                <X className="w-4 h-4" />
               </button>
             )}
           </div>
@@ -594,4 +595,3 @@ export default function PracticeHub() {
     </div>
   );
 }
-
