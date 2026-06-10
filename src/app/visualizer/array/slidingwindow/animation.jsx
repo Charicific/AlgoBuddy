@@ -25,6 +25,7 @@ const Animation = () => {
   const [messageType, setMessageType] = useState("");
   const [pendingStart, setPendingStart] = useState(false);
   const [showQuiz, setShowQuiz] = useState(false);
+  const [discussion, setDiscussion] = useState("");
 
   const {
     isPaused,
@@ -362,6 +363,26 @@ Please explain exactly what is happening in this step in detail.`;
         O(log n)
       </button>
     </div>
+  </div>
+)}
+
+{showQuiz && (
+  <div className="max-w-4xl mx-auto mb-6 bg-white dark:bg-gray-800 p-5 rounded-xl border">
+    <h3 className="text-lg font-bold mb-3">
+      💬 Community Discussion
+    </h3>
+
+    <textarea
+      value={discussion}
+      onChange={(e) => setDiscussion(e.target.value)}
+      placeholder="Ask a question or share your explanation..."
+      className="w-full p-3 border rounded-lg"
+      rows={4}
+    />
+
+    <button className="mt-3 px-4 py-2 bg-purple-600 text-white rounded-lg">
+      Post Discussion
+    </button>
   </div>
 )}
 
