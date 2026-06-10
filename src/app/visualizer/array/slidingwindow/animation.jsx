@@ -343,9 +343,12 @@ Please explain exactly what is happening in this step in detail.`;
                   Current Step
                 </span>
               </div>
-              <p className="text-gray-700 dark:text-gray-200 text-base leading-relaxed font-mono min-h-[3rem]">
-                {visualState.explanation || "Ready to begin..."}
-              </p>
+              <p
+  aria-live="polite"
+  className="text-gray-700 dark:text-gray-200 text-base leading-relaxed font-mono min-h-[3rem]"
+>
+  {visualState.explanation || "Ready to begin..."}
+</p>
             </div>
             
             <div className="bg-white dark:bg-gray-800 p-5 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm grid grid-cols-2 gap-4 text-center">
@@ -376,10 +379,12 @@ Please explain exactly what is happening in this step in detail.`;
                 return (
                   <div key={index} className="flex flex-col items-center relative">
                     <div
-                      ref={(el) => (elementRefs.current[index] = el)}
-                      className={`w-14 h-14 md:w-16 md:h-16 flex items-center justify-center rounded-lg border-2 transition-colors duration-200 ${getFontSize(element)} shadow-sm`}
-                      style={{ backgroundColor: "#E5E7EB", borderColor: "#D1D5DB" }}
-                    >
+  ref={(el) => (elementRefs.current[index] = el)}
+  tabIndex={0}
+  role="button"
+  aria-label={`Array element ${element} at index ${index}`}
+  className={`w-14 h-14 md:w-16 md:h-16 flex items-center justify-center rounded-lg border-2 transition-colors duration-200 ${getFontSize(element)} shadow-sm`}
+>
                       {element}
                     </div>
                     
