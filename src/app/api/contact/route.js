@@ -73,6 +73,17 @@ export async function POST(req) {
       return jsonResponse({ message: "Server misconfigured: email credentials missing" }, 500);
     }
 
+    const { allowed: smtpAllowed, remaining: smtpRemaining } = await checkGlobalSmtpQuota(
+      parseInt(process.env.SMTP_DAILY_QUOTA || "400", 10)
+    );
+    if (!smtpAllowed) {
+      console.error("[contact] SMTP daily quota exceeded. Email not sent.");
+      return jsonResponse({ message: "Message received." }, 200, {
+        "X-RateLimit-Limit": "5",
+        "X-RateLimit-Remaining": smtpRemaining.toString(),
+      });
+    }
+
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {

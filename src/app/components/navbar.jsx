@@ -2,10 +2,11 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
-import { useRouter, usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useUser } from "@/features/user/UserContext";
 import { supabase } from "@/lib/supabase";
 import { Moon, Sun, Menu, X, ChevronDown, Swords, LogOut, Bell } from "lucide-react";
+import { Search, Moon, Sun, Menu, X, ChevronDown, Swords, LogOut } from "lucide-react";
 import { NAV_LINKS } from "./navLinks";
 
 function getStoredTheme() {
@@ -56,6 +57,7 @@ export default function Navbar() {
 
   const pathname = usePathname();
   const router = useRouter();
+ 
   const { user, setUser } = useUser();
   const userRef = useRef(null);
 
@@ -148,10 +150,12 @@ export default function Navbar() {
       localStorage.removeItem("PROBLEM_BOOKMARKS");
     }
     router.push("/");
+     window.location.href = "/";
     setMenuOpen(false);
   };
 
   const isActive = (href) => {
+     if (!pathname) return false; 
     if (href.startsWith("http")) return false;
 
     if (href.startsWith("/#")) {
@@ -161,6 +165,8 @@ export default function Navbar() {
     return (
       pathname === href ||
       pathname.startsWith(href + "/")
+
+
     );
   };
 
@@ -183,7 +189,7 @@ export default function Navbar() {
           {/* Desktop Links with Auth Interception */}
           <div className="hidden md:flex items-center gap-7">
             {NAV_LINKS.map((l) => {
-              const dynamicHref = (l.href === "/arena" && !user) ? "/login" : l.href;
+              const dynamicHref = l.href;
 
               return (
                 <Link
@@ -326,21 +332,30 @@ export default function Navbar() {
             </button>
           </div>
 
-          <button
-            onClick={() =>
-              setMenuOpen((o) => !o)
-            }
-            aria-label="Toggle menu"
-            aria-expanded={menuOpen}
-            aria-controls="mobile-menu"
-            className="md:hidden w-10 h-10 flex items-center justify-center text-surface-600 dark:text-surface-400 rounded-lg hover:bg-surface-100 dark:hover:bg-udemy-dark-surface transition-colors focus-ring"
-          >
-            {menuOpen ? (
-              <X className="w-5 h-5" />
-            ) : (
-              <Menu className="w-5 h-5" />
-            )}
-          </button>
+          <div className="flex items-center gap-1.5 md:hidden">
+            <button
+              onClick={() => window.dispatchEvent(new CustomEvent("open-command-palette"))}
+              aria-label="Search site"
+              className="w-10 h-10 flex items-center justify-center text-surface-600 dark:text-surface-400 rounded-lg hover:bg-surface-100 dark:hover:bg-udemy-dark-surface transition-colors focus-ring"
+            >
+              <Search className="w-5 h-5" />
+            </button>
+            <button
+              onClick={() =>
+                setMenuOpen((o) => !o)
+              }
+              aria-label="Toggle menu"
+              aria-expanded={menuOpen}
+              aria-controls="mobile-menu"
+              className="w-10 h-10 flex items-center justify-center text-surface-600 dark:text-surface-400 rounded-lg hover:bg-surface-100 dark:hover:bg-udemy-dark-surface transition-colors focus-ring"
+            >
+              {menuOpen ? (
+                <X className="w-5 h-5" />
+              ) : (
+                <Menu className="w-5 h-5" />
+              )}
+            </button>
+          </div>
         </div>
       </nav>
 
@@ -352,7 +367,7 @@ export default function Navbar() {
         >
           <div className="py-2">
             {NAV_LINKS.map((l) => {
-              const dynamicHref = (l.href === "/arena" && !user) ? "/login" : l.href;
+              const dynamicHref = l.href;
 
               return (
                 <Link
