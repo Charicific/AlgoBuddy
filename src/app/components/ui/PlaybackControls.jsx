@@ -2,8 +2,10 @@ import React from "react";
 import { Play, Pause, RotateCcw, ChevronLeft, ChevronRight, Bot } from "lucide-react";
 
 export default function PlaybackControls({
-  isPlaying,
-  onPlayPause,
+  isPaused: pausedProp,
+  onTogglePlayPause: toggleProp,
+  isPlaying: playingProp,
+  onPlayPause: playPauseProp,
   speed,
   onIncreaseSpeed,
   onDecreaseSpeed,
@@ -17,16 +19,16 @@ export default function PlaybackControls({
   clearLabel = "Clear",
   progressText,
   onExplainStep,
-  /** Optional text announced to screen readers on each algorithm step */
   stepAnnouncement = "",
 }) {
+  const isPlaying = pausedProp !== undefined ? !pausedProp : (playingProp ?? false);
+  const handlePlayPause = toggleProp || playPauseProp || (() => {});
   return (
     <div
       role="toolbar"
       aria-label="Visualization controls"
       className="flex flex-col sm:flex-row items-center justify-between w-full bg-slate-900/60 backdrop-blur-xl border border-slate-800 p-3 md:p-4 rounded-2xl shadow-lg shadow-black/20 gap-4"
     >
-      {/* Hidden live region – screen readers announce algorithm step changes */}
       <div
         aria-live="polite"
         aria-atomic="true"
@@ -53,14 +55,14 @@ export default function PlaybackControls({
 
           <button
             type="button"
-            onClick={onPlayPause}
+            onClick={handlePlayPause}
             disabled={disabled}
-            aria-label={!isPlaying ? "Play algorithm animation" : "Pause algorithm animation"}
+            aria-label={isPlaying ? "Pause algorithm animation" : "Play algorithm animation"}
             aria-pressed={isPlaying}
             className="flex items-center justify-center bg-[#a435f0] text-white w-10 h-10 rounded-full hover:bg-[#8f2cd6] transition-all shadow-md shadow-[#a435f0]/30 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-[#a435f0] focus:ring-offset-2 focus:ring-offset-slate-900"
-            title={!isPlaying ? "Play" : "Pause"}
+            title={isPlaying ? "Pause" : "Play"}
           >
-            {!isPlaying ? <Play size={20} className="fill-current ml-1" aria-hidden="true" /> : <Pause size={20} className="fill-current" aria-hidden="true" />}
+            {isPlaying ? <Pause size={20} className="fill-current" aria-hidden="true" /> : <Play size={20} className="fill-current ml-1" aria-hidden="true" />}
           </button>
 
           {onStepForward && (
