@@ -141,6 +141,43 @@ export default function ArenaPage() {
 
   const [activeTab, setActiveTab] = useState("home"); // home, live, ranked, friend, leaderboard, streak, tournaments, badges, history
 
+  const handleTabChange = (tabId) => {
+    if (["ranked", "friend", "streak", "badges", "history"].includes(tabId)) {
+      if (!ensureLoggedIn()) return;
+    }
+    if (typeof window !== "undefined") {
+      window.location.hash = tabId === "home" ? "" : tabId;
+    }
+  };
+
+  useEffect(() => {
+    const handleHashChange = () => {
+      const hash = window.location.hash.replace("#", "");
+      const validTabs = ["home", "live", "ranked", "friend", "leaderboard", "streak", "tournaments", "badges", "history"];
+      const protectedTabs = ["ranked", "friend", "streak", "badges", "history"];
+      
+      if (validTabs.includes(hash)) {
+        if (protectedTabs.includes(hash) && !user) {
+          if (typeof window !== "undefined") {
+            window.location.hash = "";
+          }
+          setActiveTab("home");
+          return;
+        }
+        setActiveTab(hash);
+      } else {
+        setActiveTab("home");
+      }
+    };
+
+    handleHashChange();
+
+    window.addEventListener("hashchange", handleHashChange);
+    return () => {
+      window.removeEventListener("hashchange", handleHashChange);
+    };
+  }, [user]);
+
   // Modals state
   const [matchmakingOpen, setMatchmakingOpen] = useState(false);
   const [createDuelOpen, setCreateDuelOpen] = useState(false);
@@ -234,12 +271,7 @@ export default function ArenaPage() {
                   return (
                     <button
                       key={item.id}
-                      onClick={() => {
-                        if (["ranked", "friend", "streak", "badges", "history"].includes(item.id)) {
-                          if (!ensureLoggedIn()) return;
-                        }
-                        setActiveTab(item.id);
-                      }}
+                      onClick={() => handleTabChange(item.id)}
                       className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition ${isActive
                           ? "bg-primary text-white shadow-sm"
                           : "text-slate-500 hover:text-slate-800 hover:bg-slate-50 dark:text-neutral-400 dark:hover:text-neutral-200 dark:hover:bg-neutral-900/40"
@@ -419,7 +451,7 @@ export default function ArenaPage() {
                         </span>
                       </div>
                       <span
-                        onClick={() => setActiveTab("live")}
+                        onClick={() => handleTabChange("live")}
                         className="text-xs text-primary dark:text-purple-400 font-semibold cursor-pointer hover:underline"
                       >
                         View All
@@ -511,7 +543,7 @@ export default function ArenaPage() {
                     <div className="flex items-center justify-between mb-4">
                       <h3 className="text-sm font-bold text-slate-800 dark:text-neutral-200">Global Leaderboard</h3>
                       <span
-                        onClick={() => setActiveTab("leaderboard")}
+                        onClick={() => handleTabChange("leaderboard")}
                         className="text-xs text-primary dark:text-purple-400 font-semibold cursor-pointer hover:underline"
                       >
                         View All
@@ -547,7 +579,7 @@ export default function ArenaPage() {
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="text-sm font-bold text-slate-800 dark:text-neutral-200">Recent Battles</h3>
                     <span
-                      onClick={() => setActiveTab("history")}
+                      onClick={() => handleTabChange("history")}
                       className="text-xs text-primary dark:text-purple-400 font-semibold cursor-pointer hover:underline"
                     >
                       View All
