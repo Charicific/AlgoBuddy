@@ -1,4 +1,4 @@
-# Contributing to AlgoBuddy
+﻿# Contributing to AlgoBuddy
 
 Thank you for your interest in contributing to **AlgoBuddy**!
 We welcome and appreciate contributions from the community to help make this project better.
@@ -9,7 +9,7 @@ We welcome and appreciate contributions from the community to help make this pro
 
 ---
 
-## ↪️ Table of Contents
+## â†ªï¸ Table of Contents
 
 - [Contribution Areas](#️-contribution-areas)
 - [Tech Stack](#️-tech-stack)
@@ -22,7 +22,7 @@ We welcome and appreciate contributions from the community to help make this pro
 
 ---
 
-# ↪️ Contribution Areas
+# â†ªï¸ Contribution Areas
 
 We accept contributions in the following areas:
 
@@ -39,7 +39,7 @@ Feel free to suggest new contribution ideas by opening an issue first.
 
 ---
 
-# ↪️ Tech Stack
+# â†ªï¸ Tech Stack
 
 | Layer     | Technology                                         |
 | --------- | -------------------------------------------------- |
@@ -55,7 +55,7 @@ Feel free to suggest new contribution ideas by opening an issue first.
 
 ---
 
-# ↪️ Getting Started
+# â†ªï¸ Getting Started
 
 Follow these steps to set up the project locally.
 
@@ -112,7 +112,7 @@ The application will start locally at `http://localhost:3000`.
 
 ---
 
-# ↪️ Development Workflow
+# â†ªï¸ Development Workflow
 
 Follow the workflow below while contributing to the project.
 
@@ -210,7 +210,7 @@ To ensure fair and efficient issue management, please follow these steps:
 
 ---
 
-# ↪️ Pull Request Guidelines
+# â†ªï¸ Pull Request Guidelines
 
 Before submitting a PR:
 
@@ -224,7 +224,7 @@ Before submitting a PR:
 
 ---
 
-# ↪️ Reporting Issues
+# â†ªï¸ Reporting Issues
 
 When creating issues, please include:
 
@@ -236,7 +236,7 @@ When creating issues, please include:
 
 ---
 
-# ↪️ Need Help?
+# â†ªï¸ Need Help?
 
 If you need help while contributing:
 
@@ -248,8 +248,8 @@ We're happy to help new contributors!
 
 ---
 
-# ↪️ Thank You
+# â†ªï¸ Thank You
 
-Thank you for contributing to AlgoBuddy 💙
+Thank you for contributing to AlgoBuddy ðŸ’™
 
 Your contributions help make learning Data Structures & Algorithms more interactive and accessible for everyone.
