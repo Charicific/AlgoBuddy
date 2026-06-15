@@ -3,7 +3,6 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, Home, Zap } from 'lucide-react';
-import Link from 'next/link';
 
 const NotFoundPage = () => {
   const router = useRouter();
