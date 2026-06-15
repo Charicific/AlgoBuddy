@@ -212,19 +212,25 @@ function touchMemorySession(sessionId) {
   memorySessionTtls.set(sessionId, Date.now() + SESSION_TTL_MS);
 }
 
-function validateCsrfOrigin(request) {
-  const origin = request.headers.get("origin") || "";
-  const referer = request.headers.get("referer") || "";
-  const host = request.headers.get("host") || "";
-  const allowedOrigins = [
-    `http://${host}`,
-    `https://${host}`,
-    process.env.NEXT_PUBLIC_APP_URL,
-  ].filter(Boolean);
+const TRUSTED_ORIGINS = (() => {
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL;
+  const origins = new Set([
+    'http://localhost:3000',
+    'http://127.0.0.1:3000',
+    'https://algobuddy.me',
+    'https://www.algobuddy.me',
+    'https://algobuddy.vercel.app',
+  ]);
+  if (appUrl) origins.add(appUrl.replace(/\/+$/, ''));
+  return origins;
+})();
 
-  if (!origin && !referer) return false;
-  const source = origin || referer;
-  return allowedOrigins.some((allowed) => source.startsWith(allowed));
+function validateCsrfOrigin(request) {
+  const origin = request.headers.get("origin");
+  const referer = request.headers.get("referer");
+  const source = origin || referer || '';
+  const normalized = source.replace(/\/+$/, '');
+  return TRUSTED_ORIGINS.has(normalized);
 }
 
 function createId(prefix) {
