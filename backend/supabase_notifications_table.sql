@@ -1,10 +1,12 @@
--- Create notifications table for job alert notifications
+-- Create notifications table for job alert notifications and application status updates
 CREATE TABLE IF NOT EXISTS public.notifications (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     student_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
     job_id UUID REFERENCES public.jobs(id) ON DELETE CASCADE,
     message TEXT NOT NULL,
     read BOOLEAN NOT NULL DEFAULT false,
+    type TEXT NOT NULL DEFAULT 'new_job' CHECK (type IN ('new_job', 'application_status_update')),
+    metadata JSONB DEFAULT '{}',
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
@@ -28,11 +30,12 @@ ON public.notifications (student_id, read, created_at DESC);
 CREATE OR REPLACE FUNCTION public.notify_students_new_job()
 RETURNS TRIGGER AS $$
 BEGIN
-  INSERT INTO public.notifications (student_id, job_id, message)
+  INSERT INTO public.notifications (student_id, job_id, message, type)
   SELECT
     up.id AS student_id,
     NEW.id AS job_id,
-    'New job posted: ' || NEW.title || ' at ' || NEW.company
+    'New job posted: ' || NEW.title || ' at ' || NEW.company,
+    'new_job'
   FROM auth.users up
   WHERE up.id <> '00000000-0000-0000-0000-000000000000';
   RETURN NEW;
