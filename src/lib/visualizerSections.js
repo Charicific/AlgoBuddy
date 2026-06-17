@@ -287,6 +287,30 @@ export const sections = [
     ],
   },
   {
+    title: "Dynamic Programming",
+    slug: "dp",
+    desc: "Visualized matrices for the Knapsack Problem, Longest Common Subsequence, and Coin Change",
+    subsections: [
+      {
+        title: "Algorithms",
+        items: [
+          {
+            name: "0/1 Knapsack Problem",
+            path: "/visualizer/dp/knapsack",
+          },
+          {
+            name: "Longest Common Subsequence",
+            path: "/visualizer/dp/lcs",
+          },
+          {
+            name: "Coin Change",
+            path: "/visualizer/dp/coin-change",
+          },
+        ],
+      },
+    ],
+  },
+  {
     title: "AI Algorithms",
     slug: "ai",
     desc: "Search algorithms used in Artificial Intelligence, heuristic pathfinding, and game tree decision making",
