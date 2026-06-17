@@ -787,6 +787,10 @@ const Visualizer = () => {
 
       <KeyboardShortcuts />
 
+      <GamifiedLeaderboard />
+
+      <LearningChallenges />
+
       <AlgorithmNotes />
 
       <VisualizerClient initialSections={clientSections} />
