@@ -786,8 +786,6 @@ const Visualizer = () => {
 
       <KeyboardShortcuts />
 
-      <DifficultySelector />
-
       <VisualizerClient initialSections={clientSections} />
 
       <div className="w-full relative">
