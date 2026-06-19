@@ -93,16 +93,18 @@ export default function AuthForm({ isLogin = true }) {
       return;
     }
 
-    if (!allRequirementsMet) {
-      setPasswordError("Please meet all password requirements");
-      setLoading(false);
-      return;
-    }
+    if (!isLogin) {
+      if (!allRequirementsMet) {
+        setPasswordError("Please meet all password requirements");
+        setLoading(false);
+        return;
+      }
 
-    if (!passwordsMatch) {
-      setConfirmError("Passwords do not match");
-      setLoading(false);
-      return;
+      if (!passwordsMatch) {
+        setConfirmError("Passwords do not match");
+        setLoading(false);
+        return;
+      }
     }
 
     if (!captchaToken) {
@@ -332,15 +334,15 @@ export default function AuthForm({ isLogin = true }) {
                 loading ||
                 !captchaToken ||
                 (email && emailError) ||
-                !allRequirementsMet ||
-                !passwordsMatch
+                (!isLogin && !allRequirementsMet) ||
+                (!isLogin && !passwordsMatch)
               }
               className={`w-full flex items-center justify-center py-3 px-4 rounded text-white font-bold transition-all ${
                 loading ||
                 !captchaToken ||
                 (email && emailError) ||
-                !allRequirementsMet ||
-                !passwordsMatch
+                (!isLogin && !allRequirementsMet) ||
+                (!isLogin && !passwordsMatch)
                   ? "bg-gray-400 dark:bg-gray-600 cursor-not-allowed"
                   : "bg-udemy-purple hover:bg-udemy-purple-dark shadow-md hover:shadow-lg"
               }`}
