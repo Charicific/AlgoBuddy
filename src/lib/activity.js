@@ -5,7 +5,9 @@ const trackActivity = async (type = "site_visit") => {
     await fetch("/api/activity", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ type }),
+      // Send the browser's local calendar date so the server records activity
+      // against the user's own day rather than the server's UTC date.
+      body: JSON.stringify({ type, localDate: getLocalISODate() }),
     });
   } catch (e) {
     console.error("trackActivity failed:", e);
