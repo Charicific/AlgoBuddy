@@ -384,15 +384,22 @@ io.on("connection", async (socket) => {
   // Verify Supabase JWT from handshake auth using JWKS
   const token = socket.handshake.auth?.token;
   const authPayload = await verifyAuthToken(token);
+  
   if (!authPayload) {
-    socket.emit("error", { message: "Authentication required. Please sign in again." });
-    socket.disconnect(true);
-    return;
+    const queryUserId = socket.handshake.query?.userId;
+    if (queryUserId && queryUserId.startsWith("spectator_")) {
+      socket.data.userId = queryUserId;
+      console.log(`Spectator connected: ${socket.id}, userId: ${socket.data.userId}`);
+    } else {
+      socket.emit("error", { message: "Authentication required. Please sign in again." });
+      socket.disconnect(true);
+      return;
+    }
+  } else {
+    // Store verified userId from the JWT payload
+    socket.data.userId = authPayload.sub || authPayload.id;
+    console.log(`Authenticated user connected: ${socket.id}, userId: ${socket.data.userId}`);
   }
-
-  // Store verified userId from the JWT payload — never trust client-supplied userId
-  socket.data.userId = authPayload.sub || authPayload.id;
-  console.log(`Authenticated user connected: ${socket.id}, userId: ${socket.data.userId}`);
 
   socket.on("join_matchmaking", async (data) => {
     try {
